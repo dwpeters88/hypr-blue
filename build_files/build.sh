@@ -2,11 +2,10 @@
 
 set -ouex pipefail
 
-# Install RPM Fusion free and nonfree repositories and enable them
+# Install RPM Fusion free and nonfree repositories
 dnf5 install -y \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
   https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-dnf5 config-manager --enable rpmfusion-free rpmfusion-free-updates rpmfusion-nonfree rpmfusion-nonfree-updates
 dnf5 group update -y core multimedia sound-and-video --setop='install_weak_deps=False' --exclude=PackageKit-gstreamer-plugin
 
 # Enable Bazzite and uBlue COPRs
