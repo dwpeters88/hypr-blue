@@ -6,7 +6,8 @@ set -ouex pipefail
 dnf5 install -y \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
   https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-dnf5 group install -y core --exclude=rootfiles --exclude=PackageKit-gstreamer-plugin multimedia sound-and-video --setopt=install_weak_deps=false
+dnf5 group install -y @core --exclude=rootfiles --exclude=PackageKit-gstreamer-plugin --setopt=install_weak_deps=false
+dnf5 group install -y @multimedia @"sound-and-video" --setopt=install_weak_deps=false
 
 # Enable Bazzite and uBlue COPRs
 dnf5 copr enable -y bazzite-org/bazzite
