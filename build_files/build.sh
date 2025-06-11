@@ -6,21 +6,19 @@ set -ouex pipefail
 dnf5 install -y \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
   https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-dnf5 config-manager --enable rpmfusion-free rpmfusion-free-updates rpmfusion-nonfree rpmfusion-nonfree-updates
-dnf5 group update -y core multimedia sound-and-video --setop='install_weak_deps=False' --exclude=PackageKit-gstreamer-plugin
 
 # Enable Bazzite and uBlue COPRs
-dnf5 copr enable -y atim/hyprland-extras
 dnf5 copr enable -y bazzite-org/bazzite
 dnf5 copr enable -y ublue-os/packages
 
 # Install Hyprland and essential desktop components
+dnf5 update -y
 dnf5 install -y \
   hyprland waybar wofi kitty mako swaybg swayidle swaylock \
   pipewire wireplumber pipewire-alsa pipewire-jack-audio-connection-kit \
   xdg-desktop-portal-hyprland xdg-desktop-portal-gtk \
-  polkit-gnome tumbler ffmpegthumbnailer brightnessctl gvfs \
-  qt5ct qt6ct nwg-look \
+  tumbler ffmpegthumbnailer brightnessctl gvfs \
+  qt5ct qt6ct \
   sddm sddm-wayland-generic
 
 # Install Bazzite-DX applications

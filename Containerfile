@@ -3,7 +3,11 @@ FROM scratch AS ctx
 COPY build_files /
 
 # Base Image
-FROM quay.io/fedora/fedora-bootc:40
+FROM quay.io/fedora/fedora-bootc:42
+
+USER root
+RUN rpm-ostree override remove kernel kernel-core kernel-modules kernel-modules-core &&     rpm-ostree install --allow-inactive dnf5 util-linux dnf-plugins-core 'dnf5-command(config-manager)' &&     rpm-ostree cleanup -m
+# The ostree container commit for this stage will be combined with the next one.
 
 ## Other possible base images include:
 # FROM ghcr.io/ublue-os/bazzite:latest
@@ -15,16 +19,12 @@ FROM quay.io/fedora/fedora-bootc:40
 # CentOS base images: quay.io/centos-bootc/centos-bootc:stream10
 
 ### MODIFICATIONS
-## make modifications desired in your image and install packages by modifying th
-e build.sh script
-## the following RUN directive does all the things required to run "build.sh" as
- recommended.
 
-RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+RUN --mount=type=bind,from=ctx,source=/,target=/ctx,rw \
     --mount=type=cache,dst=/var/cache \
     --mount=type=cache,dst=/var/log \
     --mount=type=tmpfs,dst=/tmp \
-    /ctx/build.sh && \
+    chmod +x /ctx/build.sh && /ctx/build.sh && \
     ostree container commit
 
 ### LINTING
