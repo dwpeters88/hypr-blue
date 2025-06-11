@@ -3,7 +3,7 @@ FROM scratch AS ctx
 COPY build_files /
 
 # Base Image
-FROM quay.io/fedora/fedora-bootc:40
+FROM quay.io/fedora/fedora-bootc:42
 
 USER root
 RUN rpm-ostree override remove kernel kernel-core kernel-modules kernel-modules-core && \
