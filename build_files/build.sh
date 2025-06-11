@@ -2,6 +2,9 @@
 
 set -ouex pipefail
 
+mkdir -p /root/.gnupg
+chmod 700 /root/.gnupg
+
 # Install RPM Fusion free and nonfree repositories
 dnf5 install -y \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
