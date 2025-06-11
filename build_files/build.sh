@@ -29,12 +29,12 @@ dnf5 install -y \
   sysprof tiptop zsh ublue-setup-services
 
 # Install VSCode
-dnf5 config-manager --add-repo=https://packages.microsoft.com/yumrepos/vscode
 rpm --import https://packages.microsoft.com/keys/microsoft.asc
+sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
 dnf5 install -y code
 
 # Install Docker CE
-dnf5 config-manager --add-repo=https://download.docker.com/linux/fedora/docker-ce.repo
+sh -c 'echo -e "[docker-ce-stable]\nname=Docker CE Stable - \$basearch\nbaseurl=https://download.docker.com/linux/fedora/\$releasever/\$basearch/stable\nenabled=1\ngpgcheck=1\ngpgkey=https://download.docker.com/linux/fedora/gpg" > /etc/yum.repos.d/docker-ce.repo'
 dnf5 install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 systemctl enable docker.service
 systemctl enable containerd.service
