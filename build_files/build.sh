@@ -2,7 +2,7 @@
 
 set -ouex pipefail
 
-mkdir -p /root/.gnupg
+mkdir /root/.gnupg
 chmod 700 /root/.gnupg
 
 # Install RPM Fusion free and nonfree repositories
