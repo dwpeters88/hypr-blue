@@ -7,7 +7,7 @@ FROM quay.io/fedora/fedora-bootc:40
 
 USER root
 RUN rpm-ostree override remove kernel kernel-core kernel-modules kernel-modules-core && \
-    rpm-ostree install --allow-inactive dnf5 util-linux && \
+    rpm-ostree install --allow-inactive dnf5 util-linux dnf-plugins-core && \
     rpm-ostree cleanup -m
 # The ostree container commit for this stage will be combined with the next one.
 
