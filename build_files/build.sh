@@ -2,9 +2,6 @@
 
 set -ouex pipefail
 
-mkdir /root/.gnupg
-chmod 700 /root/.gnupg
-
 # Install RPM Fusion free and nonfree repositories
 dnf5 install -y \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
@@ -32,6 +29,8 @@ dnf5 install -y \
   sysprof tiptop zsh ublue-setup-services
 
 # Install VSCode
+mkdir -p /root/.gnupg
+chmod 700 /root/.gnupg
 rpm --import https://packages.microsoft.com/keys/microsoft.asc
 sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
 dnf5 install -y code
