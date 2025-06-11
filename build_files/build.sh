@@ -17,7 +17,7 @@ dnf5 install -y \
   hyprland waybar wofi kitty mako swaybg swayidle swaylock \
   pipewire wireplumber pipewire-alsa pipewire-jack-audio-connection-kit \
   xdg-desktop-portal-hyprland xdg-desktop-portal-gtk \
-  polkit-gnome tumbler ffmpegthumbnailer brightnessctl gvfs \
+  tumbler ffmpegthumbnailer brightnessctl gvfs \
   qt5ct qt6ct \
   sddm sddm-wayland-generic
 
