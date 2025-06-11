@@ -15,10 +15,8 @@ FROM quay.io/fedora/fedora-bootc:40
 # CentOS base images: quay.io/centos-bootc/centos-bootc:stream10
 
 ### MODIFICATIONS
-## make modifications desired in your image and install packages by modifying th
-e build.sh script
-## the following RUN directive does all the things required to run "build.sh" as
- recommended.
+## make modifications desired in your image and install packages by modifying the build.sh script
+## the following RUN directive does all the things required to run "build.sh" as recommended.
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,dst=/var/cache \
