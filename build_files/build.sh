@@ -127,8 +127,27 @@ dnf5 copr enable -y errornointernet/packages
 dnf5 copr enable -y tofik/nwg-shell
 
 # Restrict packages from certain COPRs
-echo "includepkgs=wallust" >> /etc/yum.repos.d/_copr_errornointernet-packages.repo
-echo "includepkgs=nwg-displays" >> /etc/yum.repos.d/_copr_tofik-nwg-shell.repo
+echo "--- Applying package restrictions to COPR repos ---"
+# Ensure the COPR repo files exist before attempting to append.
+# The dnf5 copr enable command should have created them.
+
+COPR_REPO_ERRORNOINTERNET="/etc/yum.repos.d/_copr:copr.fedorainfracloud.org:errornointernet:packages.repo"
+COPR_REPO_TOFIK_NWGSHELL="/etc/yum.repos.d/_copr:copr.fedorainfracloud.org:tofik:nwg-shell.repo"
+
+if [ -f "$COPR_REPO_ERRORNOINTERNET" ]; then
+    echo "includepkgs=wallust" >> "$COPR_REPO_ERRORNOINTERNET"
+    echo "Restricted errornointernet/packages to wallust."
+else
+    echo "WARNING: $COPR_REPO_ERRORNOINTERNET not found. Cannot apply package restriction."
+fi
+
+if [ -f "$COPR_REPO_TOFIK_NWGSHELL" ]; then
+    echo "includepkgs=nwg-displays" >> "$COPR_REPO_TOFIK_NWGSHELL"
+    echo "Restricted tofik/nwg-shell to nwg-displays."
+else
+    echo "WARNING: $COPR_REPO_TOFIK_NWGSHELL not found. Cannot apply package restriction."
+fi
+echo "Package restrictions applied."
 
 # Install Hyprland and essential desktop components
 dnf5 update -y
