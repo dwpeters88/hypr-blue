@@ -54,28 +54,6 @@ dnf5 install -y \
   qt5ct qt6ct \
   sddm sddm-wayland-generic
 
-<<<<<<< ours
-# Install Bazzite-DX applications
-dnf5 install -y \
-  gamescope-session-plus gamescope-session-steam \
-  android-tools bcc bpftop bpftrace flatpak-builder ccache nicstat numactl \
-  podman-machine podman-tui python3-ramalama qemu-kvm restic rclone \
-  sysprof tiptop zsh ublue-setup-services
-
-# Install VSCode
-echo "--- DIAGNOSTICS START ---"
-echo "Running as user: $(id)"
-echo "Listing /:"
-ls -ld /
-echo "Listing /root (if it exists):"
-ls -ld /root || echo "/root does not exist or cannot be listed."
-echo "Filesystem disk space usage:"
-df -h
-echo "--- DIAGNOSTICS END ---"
-rpm --import https://packages.microsoft.com/keys/microsoft.asc
-sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
-dnf5 install -y code
-=======
 # Install Bazzite-DX applications (bcc, bpftrace, bpftop removed)
 dnf5 install -y \
   gamescope-session-plus gamescope-session-steam \
@@ -144,7 +122,6 @@ else
   echo "ERROR: Warp Terminal RPM download failed from $WARP_RPM_URL."
 fi
 echo "--- Warp Terminal Installation Attempted ---"
->>>>>>> theirs
 
 # Install Docker CE
 sh -c 'echo -e "[docker-ce-stable]\nname=Docker CE Stable - \$basearch\nbaseurl=https://download.docker.com/linux/fedora/\$releasever/\$basearch/stable\nenabled=1\ngpgcheck=1\ngpgkey=https://download.docker.com/linux/fedora/gpg" > /etc/yum.repos.d/docker-ce.repo'
@@ -158,23 +135,6 @@ dnf5 remove -y gnome-shell plasma-desktop kde-plasma-desktop xfce4-session mate-
 
 # Enable essential services
 systemctl enable sddm
-<<<<<<< ours
-# User services will be enabled via ublue-os/startingpoint or similar mechanism for user session
-# e.g. systemctl --user enable pipewire pipewire-pulse wireplumber
-
-# Create a basic Hyprland desktop entry for SDDM
-mkdir -p /usr/share/wayland-sessions
-cat > /usr/share/wayland-sessions/hyprland.desktop <<EOF
-[Desktop Entry]
-Name=Hyprland
-Comment=An intelligent dynamic tiling Wayland compositor
-Exec=Hyprland
-Type=Application
-EOF
-
-# Clean up
-dnf5 clean all
-=======
 
 # Create a basic Hyprland desktop entry for SDDM
 echo "Creating .desktop file for Hyprland..."
@@ -190,4 +150,3 @@ echo ".desktop file created at $HYPRLAND_DESKTOP_FILE_PATH"
 # Clean up
 dnf5 clean all
 EOF
->>>>>>> theirs
