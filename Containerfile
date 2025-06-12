@@ -7,7 +7,7 @@ FROM quay.io/fedora/fedora-bootc:42
 
 USER root
 RUN rpm-ostree override remove kernel kernel-core kernel-modules kernel-modules-core && \
-    rpm-ostree install --allow-inactive dnf5 util-linux dnf-plugins-core 'dnf5-command(config-manager)' && \
+    rpm-ostree install --allow-inactive dnf5 util-linux dnf-plugins-core 'dnf5-command(config-manager)' git-core rsync && \
     rpm-ostree cleanup -m
 # The ostree container commit for this stage will be combined with the next one.
 
@@ -28,6 +28,8 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx,rw \
     --mount=type=tmpfs,dst=/tmp \
     chmod +x /ctx/build.sh && /ctx/build.sh && \
     ostree container commit
+
+LABEL org.ostree.kargs="rd.driver.blacklist=nouveau modprobe.blacklist=nouveau nvidia-drm.modeset=1 nvidia_drm.fbdev=1"
 
 ### LINTING
 ## Verify final image and contents are correct.
