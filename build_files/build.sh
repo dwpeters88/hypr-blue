@@ -3,20 +3,36 @@
 set -ouex pipefail
 export HOME=/root
 echo "--- GPG SETUP START ---"
-echo "Ensuring GPG directory exists at $HOME/.gnupg (which is $(readlink -f "$HOME")/.gnupg )"
-mkdir -vp "$HOME/.gnupg"
-if [ ! -d "$HOME/.gnupg" ]; then
-  echo "ERROR: $HOME/.gnupg was NOT created."
-  echo "Attempting to list $HOME and its target (if symlink):"
-  ls -ld "$HOME" || echo "$HOME not found or not listable"
-  if [ -L "$HOME" ]; then
-    ls -ld "$(readlink -f "$HOME")" || echo "Target of $HOME symlink not found or not listable"
-    ls -ld "$(readlink -f "$HOME")/.gnupg" || echo "Target $HOME/.gnupg not found or not listable after mkdir attempt"
-  fi
+echo "Original HOME: $HOME"
+RESOLVED_HOME_PATH="$(readlink -f "$HOME")"
+if [ -z "$RESOLVED_HOME_PATH" ]; then
+    echo "ERROR: Could not resolve real path for $HOME. Exiting."
+    exit 1
+fi
+echo "Resolved HOME path: $RESOLVED_HOME_PATH"
+REAL_GNUPG_DIR="$RESOLVED_HOME_PATH/.gnupg"
+
+echo "Ensuring GPG directory exists at resolved path: $REAL_GNUPG_DIR"
+# Create the parent directory first if it doesn't exist, then the .gnupg dir
+# This is to handle cases where /var/roothome might not exist, though unlikely for a resolved path.
+mkdir -vp "$(dirname "$REAL_GNUPG_DIR")"
+mkdir -vp "$REAL_GNUPG_DIR"
+
+if [ ! -d "$REAL_GNUPG_DIR" ]; then
+  echo "ERROR: $REAL_GNUPG_DIR was NOT created."
+  echo "Listing details:"
+  echo "HOME: $HOME"
+  ls -ld "$HOME" || echo "> $HOME not found or not listable"
+  echo "RESOLVED_HOME_PATH: $RESOLVED_HOME_PATH"
+  ls -ld "$RESOLVED_HOME_PATH" || echo "> $RESOLVED_HOME_PATH not found or not listable"
+  echo "Parent of REAL_GNUPG_DIR: $(dirname "$REAL_GNUPG_DIR")"
+  ls -ld "$(dirname "$REAL_GNUPG_DIR")" || echo "> Parent of $REAL_GNUPG_DIR not found or not listable"
+  echo "REAL_GNUPG_DIR itself: $REAL_GNUPG_DIR"
+  ls -ld "$REAL_GNUPG_DIR" || echo "> $REAL_GNUPG_DIR not found or not listable after mkdir attempt"
   exit 1
 fi
-chmod 700 "$HOME/.gnupg"
-echo "GPG directory $HOME/.gnupg ensured and permissions set."
+chmod 700 "$REAL_GNUPG_DIR"
+echo "GPG directory $REAL_GNUPG_DIR ensured and permissions set."
 echo "--- GPG SETUP END ---"
 
 # Install RPM Fusion free and nonfree repositories
