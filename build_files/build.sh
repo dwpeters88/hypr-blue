@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -ouex pipefail
+set -x # Ensure all commands and their arguments are printed
 export HOME=/root
 echo "--- GPG SETUP START ---"
 echo "Original HOME: $HOME"
@@ -69,17 +70,28 @@ CURSOR_APPIMAGE_NAME="Cursor.AppImage" # Using a generic name locally
 CURSOR_DESKTOP_FILE_PATH="/usr/share/applications/cursor.desktop"
 
 mkdir -p "$CURSOR_INSTALL_DIR"
+echo "Starting Cursor AppImage download..."
 echo "Downloading Cursor from $CURSOR_APPIMAGE_URL..."
+DOWNLOAD_SUCCESS=false
 if command -v curl >/dev/null 2>&1; then
   curl -L "$CURSOR_APPIMAGE_URL" -o "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME"
+  EXIT_CODE=$?
+  if [ $EXIT_CODE -eq 0 ]; then
+    DOWNLOAD_SUCCESS=true
+  fi
 elif command -v wget >/dev/null 2>&1; then
   wget "$CURSOR_APPIMAGE_URL" -O "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME"
+  EXIT_CODE=$?
+  if [ $EXIT_CODE -eq 0 ]; then
+    DOWNLOAD_SUCCESS=true
+  fi
 else
   echo "ERROR: Neither curl nor wget is available to download Cursor. Please install one of them."
-  # If this is critical, you might want to exit: exit 1
+  exit 1 # Exit because download cannot proceed
 fi
 
-if [ -f "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME" ] && [ -s "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME" ]; then # Check if file exists and is not empty
+if [ "$DOWNLOAD_SUCCESS" = true ] && [ -f "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME" ] && [ -s "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME" ]; then
+  echo "Cursor AppImage downloaded successfully."
   chmod +x "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME"
   echo "Cursor downloaded and made executable at $CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME"
 
@@ -95,8 +107,8 @@ if [ -f "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME" ] && [ -s "$CURSOR_INSTALL_D
   echo "MimeType=text/plain;inode/directory;" >> "$CURSOR_DESKTOP_FILE_PATH"
   echo ".desktop file created at $CURSOR_DESKTOP_FILE_PATH"
 else
-  echo "ERROR: Cursor AppImage download failed or the downloaded file is empty. URL: $CURSOR_APPIMAGE_URL"
-  # Consider exiting with an error if Cursor is essential: exit 1
+  echo "ERROR: Cursor AppImage download failed. URL: $CURSOR_APPIMAGE_URL, Exit Code: $EXIT_CODE"
+  exit 1
 fi
 echo "--- Cursor Installation Attempted ---"
 
@@ -105,31 +117,70 @@ echo "--- Installing Warp Terminal ---"
 WARP_RPM_URL="https://app.warp.dev/get_warp?package=rpm"
 WARP_RPM_LOCAL_PATH="/tmp/warp-terminal-latest.rpm"
 
+echo "Starting Warp Terminal RPM download..."
 echo "Downloading Warp Terminal from $WARP_RPM_URL..."
+DOWNLOAD_SUCCESS=false
 if command -v curl >/dev/null 2>&1; then
   curl -L "$WARP_RPM_URL" -o "$WARP_RPM_LOCAL_PATH"
+  EXIT_CODE=$?
+  if [ $EXIT_CODE -eq 0 ]; then
+    DOWNLOAD_SUCCESS=true
+  fi
 elif command -v wget >/dev/null 2>&1; then
   wget "$WARP_RPM_URL" -O "$WARP_RPM_LOCAL_PATH"
+  EXIT_CODE=$?
+  if [ $EXIT_CODE -eq 0 ]; then
+    DOWNLOAD_SUCCESS=true
+  fi
 else
   echo "ERROR: Neither curl nor wget is available to download Warp Terminal. Please install one of them."
+  exit 1 # Exit because download cannot proceed
 fi
 
-if [ -f "$WARP_RPM_LOCAL_PATH" ] && [ -s "$WARP_RPM_LOCAL_PATH" ]; then # Check if file exists and is not empty
+if [ "$DOWNLOAD_SUCCESS" = true ] && [ -f "$WARP_RPM_LOCAL_PATH" ] && [ -s "$WARP_RPM_LOCAL_PATH" ]; then
+  echo "Warp Terminal RPM downloaded successfully."
   echo "Warp Terminal RPM downloaded to $WARP_RPM_LOCAL_PATH"
   dnf5 install -y "$WARP_RPM_LOCAL_PATH"
   rm -f "$WARP_RPM_LOCAL_PATH"
   echo "Warp Terminal installed and RPM cleaned up."
 else
-  echo "ERROR: Warp Terminal RPM download failed or the downloaded file is empty. URL: $WARP_RPM_URL."
+  echo "ERROR: Warp Terminal RPM download failed. URL: $WARP_RPM_URL, Exit Code: $EXIT_CODE"
+  exit 1
 fi
 echo "--- Warp Terminal Installation Attempted ---"
 
 # Install Docker CE
+echo "Starting Docker CE repository setup..."
 sh -c 'echo -e "[docker-ce-stable]\nname=Docker CE Stable - \$basearch\nbaseurl=https://download.docker.com/linux/fedora/\$releasever/\$basearch/stable\nenabled=1\ngpgcheck=1\ngpgkey=https://download.docker.com/linux/fedora/gpg" > /etc/yum.repos.d/docker-ce.repo'
+echo "Docker CE repository setup complete."
+
+echo "Starting Docker CE packages installation..."
 dnf5 install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+EXIT_CODE=$?
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "Docker CE package installation failed. Exit code: $EXIT_CODE"
+  exit 1
+fi
+echo "Docker CE packages installation complete."
+
 systemctl enable docker.service
+EXIT_CODE=$?
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "Failed to enable docker.service. Exit code: $EXIT_CODE"
+fi
 systemctl enable containerd.service
-mkdir -p /etc/modules-load.d && echo "iptable_nat" > /etc/modules-load.d/ip_tables.conf
+EXIT_CODE=$?
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "Failed to enable containerd.service. Exit code: $EXIT_CODE"
+fi
+
+echo "Configuring iptable_nat kernel module..."
+(mkdir -p /etc/modules-load.d && echo "iptable_nat" > /etc/modules-load.d/ip_tables.conf)
+EXIT_CODE=$?
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "Warning: Failed to configure iptable_nat kernel module. Exit code: $EXIT_CODE. This might cause Docker runtime issues."
+fi
+echo "iptable_nat kernel module configuration attempted."
 
 # Remove conflicting desktop environments (defensive)
 dnf5 remove -y gnome-shell plasma-desktop kde-plasma-desktop xfce4-session mate-desktop cinnamon-desktop || echo "No conflicting DEs found or removal failed, continuing."
