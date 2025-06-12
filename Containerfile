@@ -29,6 +29,8 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx,rw \
     chmod +x /ctx/build.sh && /ctx/build.sh && \
     ostree container commit
 
+LABEL org.ostree.kargs="rd.driver.blacklist=nouveau modprobe.blacklist=nouveau nvidia-drm.modeset=1 nvidia_drm.fbdev=1"
+
 ### LINTING
 ## Verify final image and contents are correct.
 RUN bootc container lint

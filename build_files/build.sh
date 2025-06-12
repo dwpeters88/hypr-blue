@@ -212,10 +212,6 @@ Exec=Hyprland
 Type=Application
 EOF
 
-echo "--- Configuring kernel arguments for Nvidia ---"
-rpm-ostree kargs --append=rd.driver.blacklist=nouveau --append=modprobe.blacklist=nouveau --append=nvidia-drm.modeset=1 --append=nvidia_drm.fbdev=1
-echo "Nvidia kernel arguments configured."
-
 echo "--- Cloning Wallpaper-Bank repository ---"
 # Ensure git is installed
 git clone --depth=1 https://github.com/JaKooLit/Wallpaper-Bank.git /usr/share/backgrounds/JaKooLit-Wallpaper-Bank
