@@ -63,12 +63,13 @@ dnf5 install -y \
 
 # Install Cursor AppImage
 echo "--- Installing Cursor ---"
-CURSOR_APPIMAGE_URL="https://download.cursor.sh/linux/latest/Cursor.AppImage" # !!! USER: VERIFY THIS URL !!!
+CURSOR_APPIMAGE_URL="https://downloads.cursor.com/production/53b99ce608cba35127ae3a050c1738a959750865/linux/x64/Cursor-1.0.0-x86_64.AppImage" # User-provided URL
 CURSOR_INSTALL_DIR="/opt/Cursor"
-CURSOR_APPIMAGE_NAME="Cursor.AppImage"
+CURSOR_APPIMAGE_NAME="Cursor.AppImage" # Using a generic name locally
 CURSOR_DESKTOP_FILE_PATH="/usr/share/applications/cursor.desktop"
 
 mkdir -p "$CURSOR_INSTALL_DIR"
+echo "Downloading Cursor from $CURSOR_APPIMAGE_URL..."
 if command -v curl >/dev/null 2>&1; then
   curl -L "$CURSOR_APPIMAGE_URL" -o "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME"
 elif command -v wget >/dev/null 2>&1; then
@@ -78,11 +79,10 @@ else
   # If this is critical, you might want to exit: exit 1
 fi
 
-if [ -f "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME" ]; then
+if [ -f "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME" ] && [ -s "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME" ]; then # Check if file exists and is not empty
   chmod +x "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME"
   echo "Cursor downloaded and made executable at $CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME"
 
-  # Create .desktop file for Cursor using echo commands
   echo "Creating .desktop file for Cursor..."
   echo "[Desktop Entry]" > "$CURSOR_DESKTOP_FILE_PATH"
   echo "Name=Cursor" >> "$CURSOR_DESKTOP_FILE_PATH"
@@ -95,7 +95,7 @@ if [ -f "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME" ]; then
   echo "MimeType=text/plain;inode/directory;" >> "$CURSOR_DESKTOP_FILE_PATH"
   echo ".desktop file created at $CURSOR_DESKTOP_FILE_PATH"
 else
-  echo "ERROR: Cursor AppImage download failed from $CURSOR_APPIMAGE_URL. Please check the URL."
+  echo "ERROR: Cursor AppImage download failed or the downloaded file is empty. URL: $CURSOR_APPIMAGE_URL"
   # Consider exiting with an error if Cursor is essential: exit 1
 fi
 echo "--- Cursor Installation Attempted ---"
@@ -105,6 +105,7 @@ echo "--- Installing Warp Terminal ---"
 WARP_RPM_URL="https://app.warp.dev/get_warp?package=rpm"
 WARP_RPM_LOCAL_PATH="/tmp/warp-terminal-latest.rpm"
 
+echo "Downloading Warp Terminal from $WARP_RPM_URL..."
 if command -v curl >/dev/null 2>&1; then
   curl -L "$WARP_RPM_URL" -o "$WARP_RPM_LOCAL_PATH"
 elif command -v wget >/dev/null 2>&1; then
@@ -113,13 +114,13 @@ else
   echo "ERROR: Neither curl nor wget is available to download Warp Terminal. Please install one of them."
 fi
 
-if [ -f "$WARP_RPM_LOCAL_PATH" ]; then
+if [ -f "$WARP_RPM_LOCAL_PATH" ] && [ -s "$WARP_RPM_LOCAL_PATH" ]; then # Check if file exists and is not empty
   echo "Warp Terminal RPM downloaded to $WARP_RPM_LOCAL_PATH"
   dnf5 install -y "$WARP_RPM_LOCAL_PATH"
   rm -f "$WARP_RPM_LOCAL_PATH"
   echo "Warp Terminal installed and RPM cleaned up."
 else
-  echo "ERROR: Warp Terminal RPM download failed from $WARP_RPM_URL."
+  echo "ERROR: Warp Terminal RPM download failed or the downloaded file is empty. URL: $WARP_RPM_URL."
 fi
 echo "--- Warp Terminal Installation Attempted ---"
 
