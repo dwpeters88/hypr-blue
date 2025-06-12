@@ -54,6 +54,7 @@ dnf5 install -y \
   qt5ct qt6ct \
   sddm sddm-wayland-generic
 
+<<<<<<< ours
 # Install Bazzite-DX applications
 dnf5 install -y \
   gamescope-session-plus gamescope-session-steam \
@@ -74,6 +75,82 @@ echo "--- DIAGNOSTICS END ---"
 rpm --import https://packages.microsoft.com/keys/microsoft.asc
 sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
 dnf5 install -y code
+=======
+# Install Bazzite-DX applications (bcc, bpftrace, bpftop removed)
+dnf5 install -y \
+  gamescope-session-plus gamescope-session-steam \
+  android-tools flatpak-builder ccache nicstat numactl \
+  podman-machine podman-tui python3-ramalama qemu-kvm restic rclone \
+  sysprof tiptop zsh ublue-setup-services
+
+# Install Cursor AppImage
+echo "--- Installing Cursor ---"
+CURSOR_APPIMAGE_URL="https://download.cursor.sh/linux/latest/Cursor.AppImage" # !!! USER: VERIFY THIS URL !!!
+CURSOR_INSTALL_DIR="/opt/Cursor"
+CURSOR_APPIMAGE_NAME="Cursor.AppImage"
+CURSOR_DESKTOP_FILE="/usr/share/applications/cursor.desktop"
+
+mkdir -p "$CURSOR_INSTALL_DIR"
+if command -v curl >/dev/null 2>&1; then
+  curl -L "$CURSOR_APPIMAGE_URL" -o "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME"
+elif command -v wget >/dev/null 2>&1; then
+  wget "$CURSOR_APPIMAGE_URL" -O "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME"
+else
+  echo "ERROR: Neither curl nor wget is available to download Cursor. Please install one of them."
+  # If this is critical, you might want to exit: exit 1
+fi
+
+if [ -f "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME" ]; then
+  chmod +x "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME"
+  echo "Cursor downloaded and made executable at $CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME"
+
+  # Create .desktop file for Cursor
+  echo "Creating .desktop file for Cursor..."
+  cat > "$CURSOR_DESKTOP_FILE" <<EOF_DESKTOP
+[Desktop Entry]
+Name=Cursor
+Comment=AI First Code Editor
+Exec=$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME --no-sandbox %U
+Icon=cursor # Placeholder: User may need to download an icon and set the full path
+Type=Application
+Categories=Development;IDE;TextEditor;
+StartupWMClass=Cursor
+MimeType=text/plain;inode/directory;
+EOF_DESKTOP
+  echo ".desktop file created at $CURSOR_DESKTOP_FILE"
+else
+  echo "ERROR: Cursor AppImage download failed from $CURSOR_APPIMAGE_URL. Please check the URL."
+  # Consider exiting with an error if Cursor is essential: exit 1
+fi
+echo "--- Cursor Installation Attempted ---"
+
+# Install Warp Terminal
+echo "--- Installing Warp Terminal ---"
+WARP_RPM_URL="https://app.warp.dev/get_warp?package=rpm"
+WARP_RPM_LOCAL_PATH="/tmp/warp-terminal-latest.rpm" # Save with a generic name
+
+if command -v curl >/dev/null 2>&1; then
+  curl -L "$WARP_RPM_URL" -o "$WARP_RPM_LOCAL_PATH"
+elif command -v wget >/dev/null 2>&1; then
+  # wget by default uses the server-provided name, so -O is needed for a fixed local name
+  wget "$WARP_RPM_URL" -O "$WARP_RPM_LOCAL_PATH"
+else
+  echo "ERROR: Neither curl nor wget is available to download Warp Terminal. Please install one of them."
+  # Consider exiting if Warp is essential: exit 1
+fi
+
+if [ -f "$WARP_RPM_LOCAL_PATH" ]; then
+  echo "Warp Terminal RPM downloaded to $WARP_RPM_LOCAL_PATH"
+  dnf5 install -y "$WARP_RPM_LOCAL_PATH"
+  rm -f "$WARP_RPM_LOCAL_PATH" # Clean up the downloaded RPM
+  echo "Warp Terminal installed and RPM cleaned up."
+  # RPMs usually install their own .desktop files.
+else
+  echo "ERROR: Warp Terminal RPM download failed from $WARP_RPM_URL. Please check the URL."
+  # Consider exiting if Warp is essential: exit 1
+fi
+echo "--- Warp Terminal Installation Attempted ---"
+>>>>>>> theirs
 
 # Install Docker CE
 sh -c 'echo -e "[docker-ce-stable]\nname=Docker CE Stable - \$basearch\nbaseurl=https://download.docker.com/linux/fedora/\$releasever/\$basearch/stable\nenabled=1\ngpgcheck=1\ngpgkey=https://download.docker.com/linux/fedora/gpg" > /etc/yum.repos.d/docker-ce.repo'
@@ -87,18 +164,33 @@ dnf5 remove -y gnome-shell plasma-desktop kde-plasma-desktop xfce4-session mate-
 
 # Enable essential services
 systemctl enable sddm
+<<<<<<< ours
 # User services will be enabled via ublue-os/startingpoint or similar mechanism for user session
 # e.g. systemctl --user enable pipewire pipewire-pulse wireplumber
 
 # Create a basic Hyprland desktop entry for SDDM
 mkdir -p /usr/share/wayland-sessions
 cat > /usr/share/wayland-sessions/hyprland.desktop <<EOF
+=======
+
+# Create a basic Hyprland desktop entry for SDDM
+mkdir -p /usr/share/wayland-sessions
+cat > /usr/share/wayland-sessions/hyprland.desktop <<EOF_HYPRLAND
+>>>>>>> theirs
 [Desktop Entry]
 Name=Hyprland
 Comment=An intelligent dynamic tiling Wayland compositor
 Exec=Hyprland
 Type=Application
+<<<<<<< ours
 EOF
 
 # Clean up
 dnf5 clean all
+=======
+EOF_HYPRLAND
+
+# Clean up
+dnf5 clean all
+EOF
+>>>>>>> theirs
