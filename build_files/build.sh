@@ -2,6 +2,22 @@
 
 set -ouex pipefail
 export HOME=/root
+echo "--- GPG SETUP START ---"
+echo "Ensuring GPG directory exists at $HOME/.gnupg (which is $(readlink -f "$HOME")/.gnupg )"
+mkdir -vp "$HOME/.gnupg"
+if [ ! -d "$HOME/.gnupg" ]; then
+  echo "ERROR: $HOME/.gnupg was NOT created."
+  echo "Attempting to list $HOME and its target (if symlink):"
+  ls -ld "$HOME" || echo "$HOME not found or not listable"
+  if [ -L "$HOME" ]; then
+    ls -ld "$(readlink -f "$HOME")" || echo "Target of $HOME symlink not found or not listable"
+    ls -ld "$(readlink -f "$HOME")/.gnupg" || echo "Target $HOME/.gnupg not found or not listable after mkdir attempt"
+  fi
+  exit 1
+fi
+chmod 700 "$HOME/.gnupg"
+echo "GPG directory $HOME/.gnupg ensured and permissions set."
+echo "--- GPG SETUP END ---"
 
 # Install RPM Fusion free and nonfree repositories
 dnf5 install -y \
@@ -39,14 +55,6 @@ ls -ld /root || echo "/root does not exist or cannot be listed."
 echo "Filesystem disk space usage:"
 df -h
 echo "--- DIAGNOSTICS END ---"
-mkdir -v -p /root/.gnupg
-if [ -d "/root/.gnupg" ]; then
-  echo "/root/.gnupg successfully created."
-else
-  echo "ERROR: /root/.gnupg was NOT created."
-  exit 1
-fi
-chmod 700 /root/.gnupg
 rpm --import https://packages.microsoft.com/keys/microsoft.asc
 sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
 dnf5 install -y code
