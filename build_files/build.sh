@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -ouex pipefail
+export HOME=/root
 
 # Install RPM Fusion free and nonfree repositories
 dnf5 install -y \
@@ -29,7 +30,22 @@ dnf5 install -y \
   sysprof tiptop zsh ublue-setup-services
 
 # Install VSCode
-mkdir -p /root/.gnupg
+echo "--- DIAGNOSTICS START ---"
+echo "Running as user: $(id)"
+echo "Listing /:"
+ls -ld /
+echo "Listing /root (if it exists):"
+ls -ld /root || echo "/root does not exist or cannot be listed."
+echo "Filesystem disk space usage:"
+df -h
+echo "--- DIAGNOSTICS END ---"
+mkdir -v -p /root/.gnupg
+if [ -d "/root/.gnupg" ]; then
+  echo "/root/.gnupg successfully created."
+else
+  echo "ERROR: /root/.gnupg was NOT created."
+  exit 1
+fi
 chmod 700 /root/.gnupg
 rpm --import https://packages.microsoft.com/keys/microsoft.asc
 sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
