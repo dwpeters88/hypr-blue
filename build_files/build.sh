@@ -114,4 +114,3 @@ echo ".desktop file created at $HYPRLAND_DESKTOP_FILE_PATH"
 
 # Clean up
 dnf5 clean all
-EOF
