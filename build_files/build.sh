@@ -3,12 +3,12 @@
 set -ouex pipefail
 export HOME=/root
 
-# Configure DNF
-cat > /etc/dnf/dnf.conf <<EOF
-max_parallel_downloads=5
-fastestmirror=True
-defaultyes=True
-EOF
+echo "--- Setting up DNF configuration ---"
+echo "[main]" > /etc/dnf/dnf.conf
+echo "max_parallel_downloads=5" >> /etc/dnf/dnf.conf
+echo "fastestmirror=True" >> /etc/dnf/dnf.conf
+echo "defaultyes=True" >> /etc/dnf/dnf.conf
+echo "DNF configuration updated."
 
 echo "--- GPG SETUP START ---"
 echo "Original HOME: $HOME"
