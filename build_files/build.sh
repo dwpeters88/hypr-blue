@@ -88,7 +88,7 @@ echo "--- Installing Cursor ---"
 CURSOR_APPIMAGE_URL="https://download.cursor.sh/linux/latest/Cursor.AppImage" # !!! USER: VERIFY THIS URL !!!
 CURSOR_INSTALL_DIR="/opt/Cursor"
 CURSOR_APPIMAGE_NAME="Cursor.AppImage"
-CURSOR_DESKTOP_FILE="/usr/share/applications/cursor.desktop"
+CURSOR_DESKTOP_FILE_PATH="/usr/share/applications/cursor.desktop"
 
 mkdir -p "$CURSOR_INSTALL_DIR"
 if command -v curl >/dev/null 2>&1; then
@@ -104,20 +104,18 @@ if [ -f "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME" ]; then
   chmod +x "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME"
   echo "Cursor downloaded and made executable at $CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME"
 
-  # Create .desktop file for Cursor
+  # Create .desktop file for Cursor using echo commands
   echo "Creating .desktop file for Cursor..."
-  cat > "$CURSOR_DESKTOP_FILE" <<'EOF_DESKTOP'
-[Desktop Entry]
-Name=Cursor
-Comment=AI First Code Editor
-Exec=/opt/Cursor/Cursor.AppImage --no-sandbox %U
-Icon=cursor # Placeholder: User may need to download an icon and set the full path
-Type=Application
-Categories=Development;IDE;TextEditor;
-StartupWMClass=Cursor
-MimeType=text/plain;inode/directory;
-EOF_DESKTOP
-  echo ".desktop file created at $CURSOR_DESKTOP_FILE"
+  echo "[Desktop Entry]" > "$CURSOR_DESKTOP_FILE_PATH"
+  echo "Name=Cursor" >> "$CURSOR_DESKTOP_FILE_PATH"
+  echo "Comment=AI First Code Editor" >> "$CURSOR_DESKTOP_FILE_PATH"
+  echo "Exec=$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME --no-sandbox %U" >> "$CURSOR_DESKTOP_FILE_PATH"
+  echo "Icon=cursor # Placeholder: User may need to download an icon and set the full path" >> "$CURSOR_DESKTOP_FILE_PATH"
+  echo "Type=Application" >> "$CURSOR_DESKTOP_FILE_PATH"
+  echo "Categories=Development;IDE;TextEditor;" >> "$CURSOR_DESKTOP_FILE_PATH"
+  echo "StartupWMClass=Cursor" >> "$CURSOR_DESKTOP_FILE_PATH"
+  echo "MimeType=text/plain;inode/directory;" >> "$CURSOR_DESKTOP_FILE_PATH"
+  echo ".desktop file created at $CURSOR_DESKTOP_FILE_PATH"
 else
   echo "ERROR: Cursor AppImage download failed from $CURSOR_APPIMAGE_URL. Please check the URL."
   # Consider exiting with an error if Cursor is essential: exit 1
@@ -127,27 +125,23 @@ echo "--- Cursor Installation Attempted ---"
 # Install Warp Terminal
 echo "--- Installing Warp Terminal ---"
 WARP_RPM_URL="https://app.warp.dev/get_warp?package=rpm"
-WARP_RPM_LOCAL_PATH="/tmp/warp-terminal-latest.rpm" # Save with a generic name
+WARP_RPM_LOCAL_PATH="/tmp/warp-terminal-latest.rpm"
 
 if command -v curl >/dev/null 2>&1; then
   curl -L "$WARP_RPM_URL" -o "$WARP_RPM_LOCAL_PATH"
 elif command -v wget >/dev/null 2>&1; then
-  # wget by default uses the server-provided name, so -O is needed for a fixed local name
   wget "$WARP_RPM_URL" -O "$WARP_RPM_LOCAL_PATH"
 else
   echo "ERROR: Neither curl nor wget is available to download Warp Terminal. Please install one of them."
-  # Consider exiting if Warp is essential: exit 1
 fi
 
 if [ -f "$WARP_RPM_LOCAL_PATH" ]; then
   echo "Warp Terminal RPM downloaded to $WARP_RPM_LOCAL_PATH"
   dnf5 install -y "$WARP_RPM_LOCAL_PATH"
-  rm -f "$WARP_RPM_LOCAL_PATH" # Clean up the downloaded RPM
+  rm -f "$WARP_RPM_LOCAL_PATH"
   echo "Warp Terminal installed and RPM cleaned up."
-  # RPMs usually install their own .desktop files.
 else
-  echo "ERROR: Warp Terminal RPM download failed from $WARP_RPM_URL. Please check the URL."
-  # Consider exiting if Warp is essential: exit 1
+  echo "ERROR: Warp Terminal RPM download failed from $WARP_RPM_URL."
 fi
 echo "--- Warp Terminal Installation Attempted ---"
 >>>>>>> theirs
@@ -171,24 +165,27 @@ systemctl enable sddm
 # Create a basic Hyprland desktop entry for SDDM
 mkdir -p /usr/share/wayland-sessions
 cat > /usr/share/wayland-sessions/hyprland.desktop <<EOF
-=======
-
-# Create a basic Hyprland desktop entry for SDDM
-mkdir -p /usr/share/wayland-sessions
-cat > /usr/share/wayland-sessions/hyprland.desktop <<'EOF_HYPRLAND'
->>>>>>> theirs
 [Desktop Entry]
 Name=Hyprland
 Comment=An intelligent dynamic tiling Wayland compositor
 Exec=Hyprland
 Type=Application
-<<<<<<< ours
 EOF
 
 # Clean up
 dnf5 clean all
 =======
-EOF_HYPRLAND
+
+# Create a basic Hyprland desktop entry for SDDM
+echo "Creating .desktop file for Hyprland..."
+HYPRLAND_DESKTOP_FILE_PATH="/usr/share/wayland-sessions/hyprland.desktop"
+mkdir -p "$(dirname "$HYPRLAND_DESKTOP_FILE_PATH")"
+echo "[Desktop Entry]" > "$HYPRLAND_DESKTOP_FILE_PATH"
+echo "Name=Hyprland" >> "$HYPRLAND_DESKTOP_FILE_PATH"
+echo "Comment=An intelligent dynamic tiling Wayland compositor" >> "$HYPRLAND_DESKTOP_FILE_PATH"
+echo "Exec=Hyprland" >> "$HYPRLAND_DESKTOP_FILE_PATH"
+echo "Type=Application" >> "$HYPRLAND_DESKTOP_FILE_PATH"
+echo ".desktop file created at $HYPRLAND_DESKTOP_FILE_PATH"
 
 # Clean up
 dnf5 clean all
