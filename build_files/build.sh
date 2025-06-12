@@ -106,11 +106,11 @@ if [ -f "$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME" ]; then
 
   # Create .desktop file for Cursor
   echo "Creating .desktop file for Cursor..."
-  cat > "$CURSOR_DESKTOP_FILE" <<EOF_DESKTOP
+  cat > "$CURSOR_DESKTOP_FILE" <<'EOF_DESKTOP'
 [Desktop Entry]
 Name=Cursor
 Comment=AI First Code Editor
-Exec=$CURSOR_INSTALL_DIR/$CURSOR_APPIMAGE_NAME --no-sandbox %U
+Exec=/opt/Cursor/Cursor.AppImage --no-sandbox %U
 Icon=cursor # Placeholder: User may need to download an icon and set the full path
 Type=Application
 Categories=Development;IDE;TextEditor;
@@ -175,7 +175,7 @@ cat > /usr/share/wayland-sessions/hyprland.desktop <<EOF
 
 # Create a basic Hyprland desktop entry for SDDM
 mkdir -p /usr/share/wayland-sessions
-cat > /usr/share/wayland-sessions/hyprland.desktop <<EOF_HYPRLAND
+cat > /usr/share/wayland-sessions/hyprland.desktop <<'EOF_HYPRLAND'
 >>>>>>> theirs
 [Desktop Entry]
 Name=Hyprland
