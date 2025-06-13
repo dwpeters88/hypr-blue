@@ -1,6 +1,3 @@
-FROM scratch AS ctx
-COPY build_files/ /
-
 ARG FEDORA_MAJOR_VERSION=42
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_MAJOR_VERSION}
@@ -161,7 +158,7 @@ RUN usermod -s /usr/bin/zsh root || true \
     && ostree container commit
 
 # Copy configuration files from build context
-COPY --from=ctx / /
+#COPY --from=ctx / /
 
 # Final cleanup and commit
 RUN dnf clean all \
