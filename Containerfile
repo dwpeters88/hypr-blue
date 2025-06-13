@@ -11,13 +11,13 @@ LABEL com.coreos.ostree="true"
 LABEL org.opencontainers.image.title="hypr-blue"
 LABEL org.opencontainers.image.description="Custom Fedora 42 with Hyprland"
 
-# Install necessary tools
-RUN rpm-ostree install --allow-inactive dnf5 util-linux dnf-plugins-core 'dnf5-command(config-manager)' && \
-    rpm-ostree cleanup -m && \
-    ostree container commit
-
-# Remove GNOME and KDE packages but keep SDDM
-RUN rpm-ostree override remove \
+# Install necessary tools and remove GNOME/KDE packages
+RUN rpm-ostree install --allow-inactive \
+    dnf5 \
+    util-linux \
+    dnf-plugins-core \
+    'dnf5-command(config-manager)' \
+    && rpm-ostree override remove \
     gnome-shell \
     gnome-shell-extension-* \
     gnome-session \
