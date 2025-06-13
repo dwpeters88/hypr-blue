@@ -2,12 +2,8 @@
 FROM scratch AS ctx
 COPY build_files /
 
-# Base Image - Bazzite with proper version tag
-FROM ghcr.io/ublue-os/bazzite:stable
-
-# CRITICAL: Add OSTree metadata labels
-LABEL ostree.bootable="true"# Base Image - Bazzite already includes gaming features
-FROM ghcr.io/ublue-os/bazzite:stable
+# Base Image - Bazzite with AMD x86_64 platform specification
+FROM --platform=linux/amd64 ghcr.io/ublue-os/bazzite:stable
 
 # CRITICAL: Add OSTree metadata labels for bootable image
 LABEL ostree.bootable="true"
