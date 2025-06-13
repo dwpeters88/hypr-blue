@@ -256,7 +256,6 @@ EOF
 # Set Nvidia environment variables for Wayland
 RUN mkdir -p /usr/etc/environment.d && \
     cat > /usr/etc/environment.d/nvidia-hyprland.conf << 'EOF'
-# Nvidia Wayland compatibility
 LIBVA_DRIVER_NAME=nvidia
 GBM_BACKEND=nvidia-drm
 __GLX_VENDOR_LIBRARY_NAME=nvidia
