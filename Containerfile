@@ -53,16 +53,42 @@ RUN rpm-ostree override remove \
     kwin \
     && ostree container commit
 
-# Install SDDM and qt dependencies
+# Install Hyprland and dependencies
 RUN rpm-ostree install \
+    hyprland \
+    waybar \
     sddm \
     qt5-qtbase \
     qt5-qtdeclarative \
+    qt5-qtgraphicaleffects \
     qt5-qtquickcontrols \
     qt5-qtquickcontrols2 \
-    qt5-qtgraphicaleffects \
     qt5-qtsvg \
     qt5-qtmultimedia \
+    && ostree container commit
+
+# Install additional packages
+RUN rpm-ostree install \
+    alacritty \
+    firefox \
+    thunar \
+    thunar-archive-plugin \
+    thunar-media-tags-plugin \
+    thunar-volman \
+    tumbler \
+    ffmpegthumbnailer \
+    && ostree container commit
+
+# Install theme packages
+RUN rpm-ostree install \
+    kvantum-qt5 \
+    kvantum-themes \
+    && ostree container commit
+
+# Install additional utilities
+RUN rpm-ostree install \
+    wlsunset \
+    aylurs-gtk-shell \
     && ostree container commit
 
 # Install Nvidia drivers and Hyprland packages (including JaKooLit's requirements)
@@ -75,15 +101,12 @@ RUN rpm-ostree install \
     nvidia-vaapi-driver \
     libva-nvidia-driver \
     nvidia-container-toolkit \
-    hyprland \
     hyprland-contrib \
     hyprpaper \
     hyprlock \
     hypridle \
     hyprpicker \
     xdg-desktop-portal-hyprland \
-    waybar \
-    waybar-mpris \
     kitty \
     wofi \
     mako \
@@ -110,9 +133,6 @@ RUN rpm-ostree install \
     pamixer \
     qt5-qtwayland \
     qt6-qtwayland \
-    kvantum \
-    qt5ct \
-    qt6ct \
     fontawesome-fonts-all \
     google-noto-fonts-common \
     google-noto-emoji-fonts \
@@ -138,13 +158,13 @@ RUN rpm-ostree install \
     lxappearance \
     xfce4-settings \
     nwg-look \
-    kvantum-qt5 \
-    kvantum-themes \
-    && ostree container commit
-
-# Install additional tools from JaKooLit's setup
-RUN rpm-ostree install \
-    python3-pip \
+    nwg-displays \
+    nwg-dock-hyprland \
+    nwg-drawer \
+    nwg-menu \
+    azote \
+    hyprshot \
+    wlogout \
     python3-pillow \
     python3-pywayland \
     python3-screeninfo \
@@ -157,16 +177,6 @@ RUN rpm-ostree install \
     ranger \
     rofi-wayland \
     swaync \
-    nwg-displays \
-    nwg-dock-hyprland \
-    nwg-drawer \
-    nwg-menu \
-    nwg-look \
-    azote \
-    hyprshot \
-    wlogout \
-    wlsunset \
-    aylurs-gtk-shell \
     && ostree container commit
 
 # Clone and install JaKooLit's Hyprland-Dots and SDDM theme
