@@ -149,8 +149,8 @@ RUN rpm-ostree install \
 RUN systemctl enable NetworkManager.service \
     && systemctl enable bluetooth.service \
     && systemctl enable sddm.service \
-    && systemctl enable pipewire.service \
-    && systemctl enable wireplumber.service \
+     && systemctl --global enable pipewire.socket \
+    && systemctl --global enable wireplumber.service \
     && ostree container commit
 
 # Set up default shell
