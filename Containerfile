@@ -37,7 +37,7 @@ RUN rpm-ostree install \
     udisks2 \
     upower \
     pipewire \
-    pipewire-pulse \
+    pipewire-pulseaudio \
     pipewire-alsa \
     wireplumber \
     xdg-desktop-portal \
