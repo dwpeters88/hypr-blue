@@ -1,3 +1,6 @@
+FROM scratch AS ctx
+COPY build_files/ /
+
 ARG FEDORA_MAJOR_VERSION=42
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_MAJOR_VERSION}
