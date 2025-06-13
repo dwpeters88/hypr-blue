@@ -29,4 +29,4 @@ systemctl enable bluetooth.service || true
 # Clean up
 rm -rf /tmp/*
 
-echo "Build script completed successfully" 
+echo "Build script completed successfully"
