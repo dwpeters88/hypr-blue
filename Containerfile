@@ -2,14 +2,14 @@
 FROM scratch AS ctx
 COPY build_files /
 
-# Base Image - Bazzite with AMD x86_64 platform specification
-FROM --platform=linux/amd64 ghcr.io/ublue-os/bazzite:stable
+# Base Image
+FROM quay.io/fedora/fedora-bootc:42
 
 # CRITICAL: Add OSTree metadata labels for bootable image
 LABEL ostree.bootable="true"
 LABEL com.coreos.ostree="true"
 LABEL org.opencontainers.image.title="hypr-blue"
-LABEL org.opencontainers.image.description="Custom Fedora 42 Bazzite with JaKooLit Hyprland"
+LABEL org.opencontainers.image.description="Custom Fedora 42 with Hyprland"
 
 # Remove GNOME and KDE packages but keep SDDM
 RUN rpm-ostree override remove \
@@ -372,7 +372,7 @@ RUN mkdir -p /var/roothome && \
     ostree container commit
 LABEL com.coreos.ostree="true"
 LABEL org.opencontainers.image.title="hypr-blue"
-LABEL org.opencontainers.image.description="Custom Fedora 42 Bazzite with Hyprland"
+LABEL org.opencontainers.image.description="Custom Fedora 42 with Hyprland"
 LABEL io.buildah.version="1.35.0"
 
 # Set proper OSTree variables
