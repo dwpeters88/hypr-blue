@@ -52,9 +52,6 @@ RUN rpm-ostree install \
 # Install Hyprland and related packages
 RUN rpm-ostree install \
     hyprland \
-    hyprpaper \
-    hyprlock \
-    hypridle \
     waybar \
     wofi \
     mako \
