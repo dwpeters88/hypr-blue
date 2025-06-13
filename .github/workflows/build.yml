@@ -60,12 +60,23 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push Image
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.build.outputs.image }}
-          tags: ${{ steps.build.outputs.tags }}
-          registry: ${{ env.IMAGE_REGISTRY }}
+      - name: Push Image with retries
+        env:
+          IMAGE: ${{ steps.build.outputs.image }}
+          TAGS: ${{ steps.build.outputs.tags }}
+          REGISTRY: ${{ env.IMAGE_REGISTRY }}
+        run: |
+          set -e
+          IFS=$'\n'
+          for tag in $TAGS; do
+            for attempt in {1..5}; do
+              if podman push "$IMAGE:$tag" "$REGISTRY/$IMAGE:$tag"; then
+                break
+              fi
+              echo "Retry $attempt for tag $tag failed, retrying..."
+              sleep 15
+            done
+          done
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3.5.0
