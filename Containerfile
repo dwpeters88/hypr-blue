@@ -19,9 +19,6 @@ ARG IMAGE_VENDOR="${IMAGE_VENDOR:-dwpeters88}"
 ARG IMAGE_NAME="${IMAGE_NAME:-hypr-blue}"
 ARG IMAGE_BRANCH="${IMAGE_BRANCH:-main}"
 
-# Copy system configuration files
-COPY system_files/usr /usr
-
 # Run build script with proper mounts
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,dst=/var/cache/rpm-ostree \
@@ -34,8 +31,8 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     mkdir -p /var/tmp && \
     chmod 1777 /var/tmp && \
     rm -rf /tmp/* /var/tmp/* && \
-    # Ensure bootc compatibility
-    bootc container lint
-
-# Set the container as bootable
-RUN touch /etc/containers/bootc/bootc.conf
+    # Final OSTree finalization
+    mkdir -p /var/roothome && \
+    mkdir -p /var/opt && \
+    mkdir -p /var/lib/alternatives && \
+    ostree container commit
