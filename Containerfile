@@ -12,14 +12,13 @@ LABEL org.opencontainers.image.title="hypr-blue"
 LABEL org.opencontainers.image.description="Custom Fedora 42 with Hyprland"
 
 # Install necessary tools and remove GNOME/KDE packages
-RUN rpm-ostree install --allow-inactive \
+RUN rpm-ostree install --idempotent \
     dnf5 \
     util-linux \
     dnf-plugins-core \
-    'dnf5-command(config-manager)' \
     && rpm-ostree override remove \
     gnome-shell \
-    gnome-shell-extension-* \
+    gnome-shell-extensions \
     gnome-session \
     gnome-session-wayland-session \
     gnome-session-xsession \
