@@ -1,34 +1,41 @@
-# Allow build scripts to be referenced without being copied into the final image
+# Build context for scripts
 FROM scratch AS ctx
 COPY build_files /
 
-# Base Image
-FROM quay.io/fedora/fedora-bootc:42
+# Base Image - Bazzite with proper version tag
+FROM ghcr.io/ublue-os/bazzite:stable
 
-USER root
-RUN rpm-ostree override remove kernel kernel-core kernel-modules kernel-modules-core && \
-    rpm-ostree install --allow-inactive dnf5 util-linux dnf-plugins-core 'dnf5-command(config-manager)' && \
-    rpm-ostree cleanup -m
-# The ostree container commit for this stage will be combined with the next one.
+# CRITICAL: Add OSTree metadata labels
+LABEL ostree.bootable="true"
+LABEL com.coreos.ostree="true"
+LABEL org.opencontainers.image.title="hypr-blue"
+LABEL org.opencontainers.image.description="Custom Fedora 42 Bazzite with Hyprland"
+LABEL io.buildah.version="1.35.0"
 
-## Other possible base images include:
-# FROM ghcr.io/ublue-os/bazzite:latest
-# FROM ghcr.io/ublue-os/bluefin-nvidia:stable
-#
-# ... and so on, here are more base images
-# Universal Blue Images: https://github.com/orgs/ublue-os/packages
-# Fedora base image: quay.io/fedora/fedora-bootc:41
-# CentOS base images: quay.io/centos-bootc/centos-bootc:stream10
+# Set proper OSTree variables
+ARG FEDORA_MAJOR_VERSION="${FEDORA_MAJOR_VERSION:-42}"
+ARG BASE_IMAGE_NAME="${BASE_IMAGE_NAME:-bazzite}"
+ARG IMAGE_VENDOR="${IMAGE_VENDOR:-dwpeters88}"
+ARG IMAGE_NAME="${IMAGE_NAME:-hypr-blue}"
+ARG IMAGE_BRANCH="${IMAGE_BRANCH:-main}"
 
-### MODIFICATIONS
+# Copy system configuration files
+COPY system_files/usr /usr
 
-RUN --mount=type=bind,from=ctx,source=/,target=/ctx,rw \
-    --mount=type=cache,dst=/var/cache \
-    --mount=type=cache,dst=/var/log \
+# Run build script with proper mounts
+RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+    --mount=type=cache,dst=/var/cache/rpm-ostree \
+    --mount=type=tmpfs,dst=/var/tmp \
     --mount=type=tmpfs,dst=/tmp \
-    chmod +x /ctx/build.sh && /ctx/build.sh && \
-    ostree container commit
+    /ctx/build.sh && \
+    # CRITICAL: Properly commit the OSTree container
+    ostree container commit && \
+    # Clean up to reduce image size
+    mkdir -p /var/tmp && \
+    chmod 1777 /var/tmp && \
+    rm -rf /tmp/* /var/tmp/* && \
+    # Ensure bootc compatibility
+    bootc container lint
 
-### LINTING
-## Verify final image and contents are correct.
-RUN bootc container lint
+# Set the container as bootable
+RUN touch /etc/containers/bootc/bootc.conf
