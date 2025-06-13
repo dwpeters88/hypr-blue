@@ -16,7 +16,6 @@ RUN rpm-ostree install \
     dnf5 \
     util-linux \
     dnf-plugins-core \
-    && rpm-ostree cleanup -m \
     && ostree container commit
 
 # Remove GNOME and KDE packages
@@ -52,7 +51,6 @@ RUN rpm-ostree override remove \
     kde-settings \
     kde-settings-plasma \
     kwin \
-    && rpm-ostree cleanup -m \
     && ostree container commit
 
 # Install SDDM and qt dependencies
@@ -65,7 +63,6 @@ RUN rpm-ostree install \
     qt5-qtgraphicaleffects \
     qt5-qtsvg \
     qt5-qtmultimedia \
-    && rpm-ostree cleanup -m \
     && ostree container commit
 
 # Install Nvidia drivers and Hyprland packages (including JaKooLit's requirements)
@@ -143,7 +140,6 @@ RUN rpm-ostree install \
     nwg-look \
     kvantum-qt5 \
     kvantum-themes \
-    && rpm-ostree cleanup -m \
     && ostree container commit
 
 # Install additional tools from JaKooLit's setup
@@ -171,7 +167,6 @@ RUN rpm-ostree install \
     wlogout \
     wlsunset \
     aylurs-gtk-shell \
-    && rpm-ostree cleanup -m \
     && ostree container commit
 
 # Clone and install JaKooLit's Hyprland-Dots and SDDM theme
