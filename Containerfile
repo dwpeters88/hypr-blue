@@ -81,7 +81,7 @@ RUN rpm-ostree install \
     wget \
     htop \
     btop \
-    neofetch \
+    fastfetch \
     && ostree container commit
 
 # Install file managers and utilities
