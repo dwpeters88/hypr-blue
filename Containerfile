@@ -11,12 +11,16 @@ LABEL com.coreos.ostree="true"
 LABEL org.opencontainers.image.title="hypr-blue"
 LABEL org.opencontainers.image.description="Custom Fedora 42 with Hyprland"
 
-# Install necessary tools and remove GNOME/KDE packages
-RUN rpm-ostree install --idempotent \
+# Install necessary tools
+RUN rpm-ostree install \
     dnf5 \
     util-linux \
     dnf-plugins-core \
-    && rpm-ostree override remove \
+    && rpm-ostree cleanup -m \
+    && ostree container commit
+
+# Remove GNOME and KDE packages
+RUN rpm-ostree override remove \
     gnome-shell \
     gnome-shell-extensions \
     gnome-session \
@@ -48,7 +52,6 @@ RUN rpm-ostree install --idempotent \
     kde-settings \
     kde-settings-plasma \
     kwin \
-    || true \
     && rpm-ostree cleanup -m \
     && ostree container commit
 
