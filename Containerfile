@@ -4,9 +4,9 @@ FROM ghcr.io/ublue-os/bazzite-nvidia:latest AS builder
 USER root
 
 # Install prerequisites for Nix and other tools
-RUN sudo rpm-ostree install -y curl git wget util-linux-user shadow-utils && \
-    sudo rpm-ostree cleanup -m && \
-    sudo systemd-tmpfiles --create --remove
+RUN rpm-ostree install -y curl git wget util-linux-user shadow-utils && \
+    rpm-ostree cleanup -m && \
+    systemd-tmpfiles --create --remove
 
 # Install Nix (multi-user installation)
 # This creates /etc/profile.d/nix.sh for system-wide sourcing.
