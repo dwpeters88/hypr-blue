@@ -1,5 +1,5 @@
 # Stage 1: Base Bazzite with Nix and Hyprland environment
-FROM ghcr.io/ublue-os/base:latest AS builder
+FROM ghcr.io/ublue-os/bazzite-nvidia:latest AS builder
 
 USER root
 
@@ -57,47 +57,62 @@ RUN . /etc/profile.d/nix.sh && \
     nixpkgs.material-design-icons
 
 # Stage 2: Final image with dotfiles and user setup
-FROM ghcr.io/ublue-os/base:latest
+FROM ghcr.io/ublue-os/bazzite-nvidia:latest
 
 USER root
 
-# Enable RPM Fusion repositories
-RUN rpm-ostree install -y \
-    https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
-    https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm && \
-    rpm-ostree cleanup -m
-
-# Install NVIDIA drivers and remove conflicting packages
+# Remove KDE Plasma Desktop Environment
 RUN rpm-ostree override remove \
-    mesa-filesystem \
-    mesa-dri-drivers \
-    mesa-libGL \
-    mesa-libglapi \
-    mesa-libEGL \
-    mesa-vulkan-drivers \
-    mesa-libgbm \
-    mesa-libxatracker \
-    xorg-x11-drv-intel \
-    xorg-x11-drv-amdgpu \
-    xorg-x11-drv-ati \
-    xorg-x11-drv-nouveau \
-    xorg-x11-drv-vmware \
-    xorg-x11-drv-vesa \
-    xorg-x11-drv-fbdev && \
-    rpm-ostree install -y \
-    akmod-nvidia \
-    xorg-x11-drv-nvidia-cuda \
-    xorg-x11-drv-nvidia-power \
-    nvidia-settings \
-    nvidia-vaapi-driver \
-    libva-nvidia-driver && \
-    rpm-ostree cleanup -m
-
-# Blacklist Nouveau
-RUN mkdir -p /etc/modprobe.d && echo "blacklist nouveau" > /etc/modprobe.d/nvidia-blacklist.conf
-
-# Install multimedia codecs
-RUN rpm-ostree install -y ffmpeg gstreamer1-plugins-bad-freeworld gstreamer1-plugins-ugly lame\* && \
+    plasma-desktop \
+    plasma-workspace \
+    kde-spectacle \
+    dolphin \
+    konsole \
+    kate \
+    gwenview \
+    okular \
+    khelpcenter \
+    plasma-discover \
+    plasma-pa \
+    powerdevil \
+    kdialog \
+    kgamma5 \
+    kpipewire \
+    kscreen \
+    ksshaskpass \
+    ksystemats \
+    kwallet-pam \
+    kwayland-integration \
+    kwincommon \
+    libkworkspace5 \
+    plasma-browser-integration \
+    plasma-integration \
+    plasma-nm \
+    plasma-sdk \
+    plasma-systemmonitor \
+    plasma-vault \
+    plasma-welcome \
+    plasma-workspace-wallpapers \
+    sddm-kcm \
+    systemsettings \
+    kactivities-kf5 \
+    kactivitymanagerd \
+    bluedevil \
+    breeze \
+    drkonqi \
+    flatpak-kcm \
+    kde-cli-tools \
+    kde-gtk-config \
+    kdeplasma-addons \
+    khotkeys \
+    kinfocenter \
+    kmenuedit \
+    ksystemlog \
+    kwrited \
+    oxygen-sounds \
+    plasma-firewall \
+    polkit-kde \
+    xdg-desktop-portal-kde && \
     rpm-ostree cleanup -m
 
 COPY --from=builder /nix /nix
