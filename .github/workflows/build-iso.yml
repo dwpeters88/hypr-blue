@@ -1,49 +1,99 @@
-name: Build ISO
+name: Build Custom Bazzite Hyprland ISO
+
 on:
-  workflow_dispatch:
-  workflow_run:
-    workflows: ["Build and Push Image"]
-    types:
-      - completed
+  workflow_dispatch: # Allow manual triggering
+  push:
     branches:
       - main
+    paths:
+      - '.github/workflows/build-iso.yml'
+      - 'Containerfile' # Trigger if our custom container build changes
 
 env:
-  IMAGE_NAME: hypr-blue
-  IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
-  FEDORA_MAJOR_VERSION: 42
+  CUSTOM_IMAGE_NAME: bazzite-hyprland-nix
+  CUSTOM_IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
+  FEDORA_MAJOR_VERSION: 40 # Bazzite is usually on the latest stable Fedora or one behind. Adjust if needed.
+  ISO_NAME: bazzite-hyprland-nix-F${{ env.FEDORA_MAJOR_VERSION }}
 
 jobs:
-  build-iso:
+  build_custom_container_and_iso:
+    name: Build Custom Container and then ISO
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
-    
+    permissions:
+      contents: read
+      packages: write # Needed to push to GHCR
+      id-token: write # Needed for sigstore signing (optional but good practice)
+
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Build ISO
-        uses: jasonn3/build-container-installer@v1.2.2
-        id: build
+      - name: Free up disk space
+        run: |
+          echo "Initial disk space:"
+          df -h
+          sudo rm -rf /usr/share/dotnet || true
+          sudo rm -rf /opt/ghc || true
+          sudo rm -rf "/usr/local/share/boost" || true
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY" || true
+          echo "Disk space after cleanup:"
+          df -h
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.CUSTOM_IMAGE_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push Custom Container Image
+        uses: docker/build-push-action@v5
+        id: build_and_push_custom_image
+        with:
+          context: .
+          file: ./Containerfile
+          push: true
+          tags: ${{ env.CUSTOM_IMAGE_REGISTRY }}/${{ env.CUSTOM_IMAGE_NAME }}:latest,${{ env.CUSTOM_IMAGE_REGISTRY }}/${{ env.CUSTOM_IMAGE_NAME }}:F${{ env.FEDORA_MAJOR_VERSION }}
+          # Optional: Add provenance and SBOM scanning
+          # provenance: true
+          # sbom: true
+
+      - name: Build ISO using Custom Container
+        uses: jasonn3/build-container-installer@v1.3.0 # Using a more recent version
+        id: build_iso
         with:
           arch: x86_64
-          image_name: ${{ env.IMAGE_NAME }}
-          image_repo: ${{ env.IMAGE_REGISTRY }}
-          image_tag: latest
+          # These now point to the custom image we just built and pushed
+          image_name: ${{ env.CUSTOM_IMAGE_NAME }}
+          image_repo: ${{ env.CUSTOM_IMAGE_REGISTRY }}
+          image_tag: F${{ env.FEDORA_MAJOR_VERSION }} # Use the versioned tag
           version: ${{ env.FEDORA_MAJOR_VERSION }}
-          variant: Kinoite
-          iso_name: ${{ env.IMAGE_NAME }}-${{ env.FEDORA_MAJOR_VERSION }}.iso
-          enable_cache_dnf: "false"
-          enable_cache_skopeo: "false"
-          enable_flatpak_dependencies: "false"
-          enrollment_password: "universalblue"
+          # variant: is not needed as we provide the full image path
+          iso_name: ${{ env.ISO_NAME }}.iso
+          # enable_cache_dnf: "false" # Keep as false unless specific reason
+          # enable_cache_skopeo: "false" # Keep as false
+          # enable_flatpak_dependencies: "false" # We are not focusing on flatpaks here
+          enrollment_password: "changeme" # Change as needed, or make it a secret
+          # Using the ublue-os key as Bazzite is derived from it.
           secure_boot_key_url: 'https://github.com/ublue-os/akmods/raw/main/certs/public_key.der'
-          
-      - name: Upload ISO
+          # Optional: Add kickstart_repos if you need extra RPMs not in the container
+          # kickstart_repos: |
+          #   [myrepo]
+          #   name=myrepo
+          #   baseurl=https://example.com/myrepo
+          #   enabled=1
+          #   gpgcheck=0
+
+      - name: Upload ISO as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.IMAGE_NAME }}-${{ env.FEDORA_MAJOR_VERSION }}.iso
-          path: ${{ steps.build.outputs.iso_path }}
+          name: ${{ env.ISO_NAME }}.iso
+          path: |
+            ${{ steps.build_iso.outputs.iso_path }}
+            ${{ steps.build_iso.outputs.iso_path }}.CHECKSUM
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
