@@ -37,7 +37,7 @@ RUN . /etc/profile.d/nix.sh && \
     nixpkgs.kitty \
     nixpkgs.swaynotificationcenter \
     nixpkgs.cava \
-    nixpkgs.qt5ct \
+    nixpkgs.libsForQt5.qt5ct \
     nixpkgs.qt6ct \
     nixpkgs.swappy \
     nixpkgs.wallust \
@@ -60,6 +60,61 @@ RUN . /etc/profile.d/nix.sh && \
 FROM ghcr.io/ublue-os/bazzite-nvidia:latest
 
 USER root
+
+# Remove KDE Plasma Desktop Environment
+RUN rpm-ostree override remove \
+    plasma-desktop \
+    plasma-workspace \
+    kde-spectacle \
+    dolphin \
+    konsole \
+    kate \
+    gwenview \
+    okular \
+    khelpcenter \
+    plasma-discover \
+    plasma-pa \
+    powerdevil \
+    kdialog \
+    kgamma5 \
+    kpipewire \
+    kscreen \
+    ksshaskpass \
+    ksystemats \
+    kwallet-pam \
+    kwayland-integration \
+    kwincommon \
+    libkworkspace5 \
+    plasma-browser-integration \
+    plasma-integration \
+    plasma-nm \
+    plasma-sdk \
+    plasma-systemmonitor \
+    plasma-vault \
+    plasma-welcome \
+    plasma-workspace-wallpapers \
+    sddm-kcm \
+    systemsettings \
+    kactivities-kf5 \
+    kactivitymanagerd \
+    bluedevil \
+    breeze \
+    drkonqi \
+    flatpak-kcm \
+    kde-cli-tools \
+    kde-gtk-config \
+    kdeplasma-addons \
+    khotkeys \
+    kinfocenter \
+    kmenuedit \
+    ksystemlog \
+    kwrited \
+    oxygen-sounds \
+    plasma-firewall \
+    polkit-kde \
+    xdg-desktop-portal-kde && \
+    rpm-ostree cleanup -m
+
 COPY --from=builder /nix /nix
 COPY --from=builder /etc/profile.d/nix.sh /etc/profile.d/nix.sh
 
@@ -100,8 +155,8 @@ RUN echo 'if [ -e /etc/profile.d/nix.sh ]; then . /etc/profile.d/nix.sh; fi' >> 
 # Define image metadata
 # Moved comments above LABEL instructions
 # Name of the image
-LABEL name="bazzite-hyprland-nix"
+LABEL name="bazzite-dx-nvidia"
 # Version of this custom build
-LABEL version="0.5"
+LABEL version="0.1"
 # Description of the image
-LABEL description="Bazzite with Hyprland (from Nix) and JaKooLit dots (syntax fix attempt 3)"
+LABEL description="Bazzite DX Nvidia base image without KDE/GNOME, with Hyprland installed via Nix."

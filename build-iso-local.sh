@@ -29,7 +29,7 @@ DEFAULT_PLATFORM="linux/amd64"
 DEFAULT_CPUS=$(get_cpu_cores)
 DEFAULT_MEMORY_GB=$(get_memory_gb)
 DEFAULT_DISK_SIZE_GB="100" # Default disk size for Podman machine
-DEFAULT_IMAGE_NAME="hypr-blue"
+DEFAULT_IMAGE_NAME="bazzite-dx-nvidia"
 DEFAULT_IMAGE_TAG="iso-build-local"
 DEFAULT_CONTAINERFILE="Containerfile"
 DEFAULT_FEDORA_VERSION="42"
@@ -50,7 +50,7 @@ VARIANT="${VARIANT:-$DEFAULT_VARIANT}"
 ISO_NAME="${ISO_NAME:-${IMAGE_NAME}-${FEDORA_VERSION}.iso}"
 ISO_OUTPUT_DIR="${ISO_OUTPUT_DIR:-$DEFAULT_ISO_OUTPUT_DIR}"
 BUILDER_IMAGE="${BUILDER_IMAGE:-$DEFAULT_BUILDER_IMAGE}"
-KICKSTART_PATH="${KICKSTART_PATH:-config/hyper-blue.ks}" # Default kickstart path
+KICKSTART_PATH="${KICKSTART_PATH:-config/bazzite-dx-nvidia.ks}" # Default kickstart path
 
 # ISO Builder specific options (mirroring GitHub action inputs)
 # Defaulting to false as in the workflow, but making them configurable
