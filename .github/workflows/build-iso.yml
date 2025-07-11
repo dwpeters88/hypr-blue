@@ -10,10 +10,10 @@ on:
       - 'Containerfile' # Trigger if our custom container build changes
 
 env:
-  CUSTOM_IMAGE_NAME: bazzite-hyprland-nix
+  CUSTOM_IMAGE_NAME: bazzite-dx-nvidia
   CUSTOM_IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
   FEDORA_MAJOR_VERSION: 40 # Bazzite is usually on the latest stable Fedora or one behind. Adjust if needed.
-  ISO_NAME: bazzite-hyprland-nix-F${{ env.FEDORA_MAJOR_VERSION }}
+  ISO_NAME: bazzite-dx-nvidia-F${{ env.FEDORA_MAJOR_VERSION }}
 
 jobs:
   build_custom_container_and_iso:
@@ -79,6 +79,7 @@ jobs:
           enrollment_password: "changeme" # Change as needed, or make it a secret
           # Using the ublue-os key as Bazzite is derived from it.
           secure_boot_key_url: 'https://github.com/ublue-os/akmods/raw/main/certs/public_key.der'
+          kickstart_file_path: config/bazzite-dx-nvidia.ks # Specify the new kickstart file
           # Optional: Add kickstart_repos if you need extra RPMs not in the container
           # kickstart_repos: |
           #   [myrepo]

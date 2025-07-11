@@ -9,7 +9,7 @@ keyboard --vckeymap=us --xlayouts='us'
 lang en_US.UTF-8
 
 # OSTree setup - CRITICAL for fixing the deployment error
-ostreesetup --nogpg --osname=hypr-blue --remote=hypr-blue --url=https://ghcr.io/dwpeters88/hypr-blue --ref=ostree/1/1/0
+ostreesetup --nogpg --osname=bazzite-dx-nvidia --remote=bazzite-dx-nvidia --url=https://ghcr.io/ublue-os/bazzite-dx-nvidia --ref=ostree/1/1/0
 
 # Network information
 network --bootproto=dhcp --device=link --activate
@@ -47,9 +47,9 @@ chroot /mnt/sysimage restorecon -Rv /usr || true
 chroot /mnt/sysimage restorecon -Rv /etc || true
 
 # Ensure OSTree remote is properly configured
-cat > /mnt/sysimage/etc/ostree/remotes.d/hypr-blue.conf << EOF
-[remote "hypr-blue"]
-url=https://ghcr.io/dwpeters88/hypr-blue
+cat > /mnt/sysimage/etc/ostree/remotes.d/bazzite-dx-nvidia.conf << EOF
+[remote "bazzite-dx-nvidia"]
+url=https://ghcr.io/ublue-os/bazzite-dx-nvidia
 gpg-verify=false
 EOF
 %end

@@ -1,5 +1,5 @@
 # Stage 1: Base Bazzite with Nix and Hyprland environment
-FROM ghcr.io/ublue-os/bazzite-nvidia:latest AS builder
+FROM ghcr.io/ublue-os/nvidia:latest AS builder
 
 USER root
 
@@ -57,7 +57,7 @@ RUN . /etc/profile.d/nix.sh && \
     nixpkgs.material-design-icons
 
 # Stage 2: Final image with dotfiles and user setup
-FROM ghcr.io/ublue-os/bazzite-nvidia:latest
+FROM ghcr.io/ublue-os/nvidia:latest
 
 USER root
 COPY --from=builder /nix /nix
@@ -100,8 +100,8 @@ RUN echo 'if [ -e /etc/profile.d/nix.sh ]; then . /etc/profile.d/nix.sh; fi' >> 
 # Define image metadata
 # Moved comments above LABEL instructions
 # Name of the image
-LABEL name="bazzite-hyprland-nix"
+LABEL name="bazzite-dx-nvidia"
 # Version of this custom build
-LABEL version="0.5"
+LABEL version="0.1"
 # Description of the image
-LABEL description="Bazzite with Hyprland (from Nix) and JaKooLit dots (syntax fix attempt 3)"
+LABEL description="Bazzite DX Nvidia base image without KDE/GNOME, with Hyprland installed via Nix."
