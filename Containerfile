@@ -1,5 +1,5 @@
 # Stage 1: Base Bazzite with Nix and Hyprland environment
-FROM ghcr.io/ublue-os/nvidia:latest AS builder
+FROM ghcr.io/ublue-os/base:latest AS builder
 
 USER root
 
@@ -57,9 +57,49 @@ RUN . /etc/profile.d/nix.sh && \
     nixpkgs.material-design-icons
 
 # Stage 2: Final image with dotfiles and user setup
-FROM ghcr.io/ublue-os/nvidia:latest
+FROM ghcr.io/ublue-os/base:latest
 
 USER root
+
+# Enable RPM Fusion repositories
+RUN rpm-ostree install -y \
+    https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+    https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm && \
+    rpm-ostree cleanup -m
+
+# Install NVIDIA drivers and remove conflicting packages
+RUN rpm-ostree override remove \
+    mesa-filesystem \
+    mesa-dri-drivers \
+    mesa-libGL \
+    mesa-libglapi \
+    mesa-libEGL \
+    mesa-vulkan-drivers \
+    mesa-libgbm \
+    mesa-libxatracker \
+    xorg-x11-drv-intel \
+    xorg-x11-drv-amdgpu \
+    xorg-x11-drv-ati \
+    xorg-x11-drv-nouveau \
+    xorg-x11-drv-vmware \
+    xorg-x11-drv-vesa \
+    xorg-x11-drv-fbdev && \
+    rpm-ostree install -y \
+    akmod-nvidia \
+    xorg-x11-drv-nvidia-cuda \
+    xorg-x11-drv-nvidia-power \
+    nvidia-settings \
+    nvidia-vaapi-driver \
+    libva-nvidia-driver && \
+    rpm-ostree cleanup -m
+
+# Blacklist Nouveau
+RUN mkdir -p /etc/modprobe.d && echo "blacklist nouveau" > /etc/modprobe.d/nvidia-blacklist.conf
+
+# Install multimedia codecs
+RUN rpm-ostree install -y ffmpeg gstreamer1-plugins-bad-freeworld gstreamer1-plugins-ugly lame\* && \
+    rpm-ostree cleanup -m
+
 COPY --from=builder /nix /nix
 COPY --from=builder /etc/profile.d/nix.sh /etc/profile.d/nix.sh
 
