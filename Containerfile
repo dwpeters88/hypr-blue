@@ -37,7 +37,7 @@ RUN . /etc/profile.d/nix.sh && \
     nixpkgs.kitty \
     nixpkgs.swaynotificationcenter \
     nixpkgs.cava \
-    nixpkgs.qt5ct \
+    nixpkgs.libsForQt5.qt5ct \
     nixpkgs.qt6ct \
     nixpkgs.swappy \
     nixpkgs.wallust \
