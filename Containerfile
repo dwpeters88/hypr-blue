@@ -52,7 +52,7 @@ RUN . /etc/profile.d/nix.sh && \
     nixpkgs.jq \
     nixpkgs.libnotify \
     nixpkgs.bc \
-    nixpkgs.nerdfonts.JetBrainsMono \
+    nixpkgs.nerd-fonts.jetbrains-mono \
     nixpkgs.font-awesome \
     nixpkgs.material-design-icons
 
